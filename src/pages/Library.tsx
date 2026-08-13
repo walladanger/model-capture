@@ -79,8 +79,16 @@ export default function Library() {
                 }}
                 className="group relative cursor-pointer overflow-hidden rounded-lg border border-border bg-card text-left transition-colors hover:border-foreground/20"
               >
-                <div className="flex h-40 items-center justify-center border-b border-border bg-gradient-to-b from-secondary/60 to-card">
-                  <Box className="size-10 text-muted-foreground/50 transition-transform group-hover:scale-105" />
+                <div className="relative flex h-40 items-center justify-center overflow-hidden border-b border-border bg-gradient-to-b from-secondary/60 to-card">
+                  {model.thumbnailUrl ? (
+                    <img
+                      src={model.thumbnailUrl}
+                      alt={model.name}
+                      className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                    />
+                  ) : (
+                    <Box className="size-10 text-muted-foreground/50 transition-transform group-hover:scale-105" />
+                  )}
                 </div>
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-2">

@@ -1,4 +1,4 @@
-import { useMutation } from "convex/react";
+import { useAction, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router";
@@ -25,6 +25,7 @@ export default function Capture() {
   const createCapture = useMutation(api.captures.create);
   const setCaptureStatus = useMutation(api.captures.setStatus);
   const createModel = useMutation(api.models.create);
+  const reconstruct = useAction(api.reconstruct.fromCapture);
 
   function addFiles(files: FileList | null) {
     if (!files) return;
@@ -58,8 +59,25 @@ export default function Capture() {
       });
       setCaptureId(captureId);
 
-      // Simulated reconstruction window (real photogrammetry provider plugs in here).
-      await new Promise((r) => setTimeout(r, 2400));
+      // Try the real photogrammetry pipeline (Tripo). Falls back to a demo
+      // model when the provider is not configured or reconstruction fails.
+      try {
+        const { modelId } = await reconstruct({ captureId: captureId as never });
+        toast.success("Reconstruction complete");
+        navigate(`/app/models/${modelId}`);
+        return;
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "";
+        if (message.includes("RECONSTRUCTION_NOT_CONFIGURED")) {
+          toast("Photogrammetry provider not configured", {
+            description:
+              "Add a Tripo API key to enable real reconstruction. Showing a demo model.",
+          });
+        } else {
+          console.error(err);
+          toast.error("Reconstruction failed. Showing a demo model.");
+        }
+      }
 
       const demo = buildDemoModel();
       const { blob } = await exportModel(demo, "glb", "reconstruction");
@@ -118,7 +136,8 @@ export default function Capture() {
         </div>
         <p className="mt-5 text-sm font-medium">Reconstructing your object…</p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Aligning {photos.length} photos and building the mesh.
+          Aligning {photos.length} photos and building the mesh. This can take a
+          minute or two.
         </p>
       </div>
     );
@@ -154,9 +173,9 @@ export default function Capture() {
               color={null}
             />
           )}
-          <div className="absolute left-1/2 top-4 -translate-x-1/2 rounded-md border border-border bg-card/90 px-3 py-2 text-xs text-muted-foreground backdrop-blur">
-            Demo reconstruction — connect a photogrammetry provider for production-quality
-            results. Import a real model or edit this one below.
+          <div className="absolute left-1/2 top-4 w-max max-w-[90%] -translate-x-1/2 rounded-md border border-border bg-card/90 px-3 py-2 text-center text-xs text-muted-foreground backdrop-blur">
+            Demo model — add a Tripo API key (TRIPO_API_KEY) to enable real
+            photogrammetry. Import a real model or edit this one below.
           </div>
         </div>
       </div>
