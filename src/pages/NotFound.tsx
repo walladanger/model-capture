@@ -1,25 +1,33 @@
 import { motion } from "framer-motion";
+import { ArrowLeft, ScanLine } from "lucide-react";
+import { Link } from "react-router";
+import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="min-h-screen flex flex-col"
+      transition={{ duration: 0.4 }}
+      className="flex min-h-screen flex-col bg-background text-foreground"
     >
-
-      
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center">
-        <div className="max-w-5xl mx-auto relative px-4">
-          <div className="flex items-center justify-center min-h-[200px]">
-            <div className="text-center">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
-              <p className="text-lg text-gray-600">Page Not Found</p>
-            </div>
-          </div>
+      <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
+        <div className="flex size-12 items-center justify-center rounded-md bg-foreground text-background">
+          <ScanLine className="size-5" />
         </div>
+        <p className="mt-8 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+          404
+        </p>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight">Page not found</h1>
+        <p className="mt-3 max-w-sm text-sm leading-6 text-muted-foreground">
+          The page you&apos;re looking for doesn&apos;t exist or may have been moved.
+        </p>
+        <Button asChild variant="outline" className="mt-8 gap-2">
+          <Link to="/">
+            <ArrowLeft className="size-4" />
+            Back to home
+          </Link>
+        </Button>
       </div>
     </motion.div>
   );

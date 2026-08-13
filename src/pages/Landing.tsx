@@ -143,7 +143,9 @@ export default function Landing() {
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <Link to="/auth?returnTo=%2Fapp%2Fimport">Import a model</Link>
+                <Link to={isAuthenticated ? "/app/import" : "/auth?returnTo=%2Fapp%2Fimport"}>
+                  Import a model
+                </Link>
               </Button>
             </div>
           </motion.div>

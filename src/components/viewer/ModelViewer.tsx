@@ -233,7 +233,11 @@ function SceneInner({
     clearErase: () => {
       for (const c of cachesRef.current) c.removed.clear();
       undoStackRef.current = [];
+      applyRemovals(cachesRef.current);
       onEraseCount?.(0);
+      if (statsRef.current && objectRef.current) {
+        statsRef.current = computeStats(objectRef.current);
+      }
     },
     getObject: () => objectRef.current,
     getStats: () => statsRef.current,

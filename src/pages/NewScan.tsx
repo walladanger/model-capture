@@ -17,7 +17,7 @@ const OPTIONS = [
     description:
       "Bring in an existing GLB, glTF, OBJ, STL or PLY file to view, edit and export.",
     icon: Upload,
-    to: "/app/models/import",
+    to: "/app/import",
   },
 ];
 
