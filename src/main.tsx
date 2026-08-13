@@ -6,13 +6,19 @@ import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { ConvexReactClient } from "convex/react";
 import React, { StrictMode, useEffect, lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Route, Routes, useLocation } from "react-router";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router";
 import "./index.css";
 
 // Lazy load route components for better code splitting
 const Landing = lazy(() => import("./pages/Landing.tsx"));
 const AuthPage = lazy(() => import("./pages/Auth.tsx"));
-const Dashboard = lazy(() => import("./pages/Dashboard.tsx"));
+const AppShell = lazy(() => import("./pages/AppShell.tsx"));
+const Library = lazy(() => import("./pages/Library.tsx"));
+const NewScan = lazy(() => import("./pages/NewScan.tsx"));
+const Capture = lazy(() => import("./pages/Capture.tsx"));
+const Import = lazy(() => import("./pages/Import.tsx"));
+const Studio = lazy(() => import("./pages/Studio.tsx"));
+const Settings = lazy(() => import("./pages/Settings.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 // Simple loading fallback for route transitions
@@ -122,15 +128,26 @@ createRoot(document.getElementById("root")!).render(
               <Route path="/" element={<Landing />} />
               <Route
                 path="/auth"
-                element={<AuthPage redirectAfterAuth="/dashboard" />}
+                element={<AuthPage redirectAfterAuth="/app" />}
               />
               <Route
-                path="/dashboard"
+                path="/app"
                 element={
                   <RequireAuth>
-                    <Dashboard />
+                    <AppShell />
                   </RequireAuth>
                 }
+              >
+                <Route index element={<Library />} />
+                <Route path="new" element={<NewScan />} />
+                <Route path="capture" element={<Capture />} />
+                <Route path="import" element={<Import />} />
+                <Route path="models/:modelId" element={<Studio />} />
+                <Route path="settings" element={<Settings />} />
+              </Route>
+              <Route
+                path="/dashboard"
+                element={<Navigate to="/app" replace />}
               />
               <Route path="*" element={<NotFound />} />
             </Routes>

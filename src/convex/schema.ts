@@ -16,6 +16,28 @@ export const roleValidator = v.union(
 );
 export type Role = Infer<typeof roleValidator>;
 
+export const modelFormatValidator = v.union(
+  v.literal("glb"),
+  v.literal("gltf"),
+  v.literal("obj"),
+  v.literal("stl"),
+  v.literal("ply"),
+);
+export type ModelFormat = Infer<typeof modelFormatValidator>;
+
+export const modelSourceValidator = v.union(
+  v.literal("import"),
+  v.literal("capture"),
+);
+export type ModelSource = Infer<typeof modelSourceValidator>;
+
+export const modelStatusValidator = v.union(
+  v.literal("processing"),
+  v.literal("ready"),
+  v.literal("failed"),
+);
+export type ModelStatus = Infer<typeof modelStatusValidator>;
+
 const schema = defineSchema(
   {
     // default auth tables using convex auth.
@@ -30,14 +52,45 @@ const schema = defineSchema(
       isAnonymous: v.optional(v.boolean()), // is the user anonymous. do not remove
 
       role: v.optional(roleValidator), // role of the user. do not remove
+
+      // product-specific profile fields
+      preferences: v.optional(
+        v.object({
+          defaultExportFormat: v.optional(modelFormatValidator),
+          units: v.optional(v.union(v.literal("m"), v.literal("cm"), v.literal("mm"))),
+        }),
+      ),
     }).index("email", ["email"]), // index for the email. do not remove or modify
 
-    // add other tables here
+    // a 3D model owned by a user
+    models: defineTable({
+      userId: v.id("users"),
+      name: v.string(),
+      storageId: v.id("_storage"),
+      format: modelFormatValidator,
+      source: modelSourceValidator,
+      status: modelStatusValidator,
+      thumbnailStorageId: v.optional(v.id("_storage")),
+      vertexCount: v.optional(v.number()),
+      triangleCount: v.optional(v.number()),
+      captureId: v.optional(v.id("captures")),
+    })
+      .index("by_user", ["userId"])
+      .index("by_capture", ["captureId"]),
 
-    // tableName: defineTable({
-    //   ...
-    //   // table fields
-    // }).index("by_field", ["field"])
+    // a capture session: a set of photos used to reconstruct a model
+    captures: defineTable({
+      userId: v.id("users"),
+      name: v.string(),
+      status: v.union(
+        v.literal("collecting"),
+        v.literal("processing"),
+        v.literal("ready"),
+        v.literal("failed"),
+      ),
+      photoStorageIds: v.array(v.id("_storage")),
+      modelId: v.optional(v.id("models")),
+    }).index("by_user", ["userId"]),
   },
   {
     schemaValidation: false,

@@ -18,15 +18,15 @@ export const emailOtp = Email({
   async sendVerificationRequest({ identifier: email, token }) {
     try {
       await axios.post(
-        "https://email.vly.ai/send_otp",
+        "https://auth.freebuff.app/send_otp",
         {
           to: email,
           otp: token,
-          appName: process.env.VLY_APP_NAME || "a vly.ai application",
+          appName: process.env.VLY_APP_NAME || "a freebuff.com application",
         },
         {
           headers: {
-            "x-api-key": "vlytothemoon2025",
+            "x-api-key": "fb_email_2crN1hqIArZP2bEfvjp5Qik4",
           },
         },
       );
